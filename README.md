@@ -403,14 +403,6 @@ export API_TIMEOUT_SECONDS=600       # API超时时间
 
 ---
 
-## 📞 联系方式
-
-- 问题反馈：[GitHub Issues]
-- 邮件：[团队邮箱]
-- 文档：[项目Wiki]
-
----
-
 ## 📋 项目维护状态
 
 - ✅ **稳定版本**: v1.0
