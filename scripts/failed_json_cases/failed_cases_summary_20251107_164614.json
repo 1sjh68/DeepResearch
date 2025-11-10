@@ -1,0 +1,76 @@
+{
+  "timestamp": "20251107_164614",
+  "total_cases": 10,
+  "cases": [
+    {
+      "index": 1,
+      "schema": "CritiqueModel",
+      "error_message": "expected value at line 1 column 4754",
+      "error_position": 4754,
+      "json_length": 4883
+    },
+    {
+      "index": 2,
+      "schema": "CritiqueModel",
+      "error_message": "expected value at line 1 column 4754",
+      "error_position": 4754,
+      "json_length": 4883
+    },
+    {
+      "index": 3,
+      "schema": "CritiqueModel",
+      "error_message": "expected value at line 1 column 4560",
+      "error_position": 4560,
+      "json_length": 5363
+    },
+    {
+      "index": 4,
+      "schema": "CritiqueModel",
+      "error_message": "expected value at line 1 column 4560",
+      "error_position": 4560,
+      "json_length": 5363
+    },
+    {
+      "index": 5,
+      "schema": "unknown",
+      "error_message": "trailing characters at line 1 column 6926",
+      "error_position": 6926,
+      "json_length": 6926
+    },
+    {
+      "index": 6,
+      "schema": "unknown",
+      "error_message": "trailing characters at line 1 column 6926",
+      "error_position": 6926,
+      "json_length": 6926
+    },
+    {
+      "index": 7,
+      "schema": "unknown",
+      "error_message": "trailing characters at line 1 column 4567",
+      "error_position": 4567,
+      "json_length": 4567
+    },
+    {
+      "index": 8,
+      "schema": "unknown",
+      "error_message": "trailing characters at line 1 column 4567",
+      "error_position": 4567,
+      "json_length": 4567
+    },
+    {
+      "index": 9,
+      "schema": "unknown",
+      "error_message": "expected `:` at line 1 column 13816",
+      "error_position": 13816,
+      "json_length": 48
+    },
+    {
+      "index": 10,
+      "schema": "unknown",
+      "error_message": "expected `:` at line 1 column 13816",
+      "error_position": 13816,
+      "json_length": 48
+    }
+  ]
+}

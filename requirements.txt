@@ -1,0 +1,97 @@
+# --- 核心 AI 与模型 ---
+openai>=1.12.0
+tiktoken
+pydantic>=2.7.0,<3
+instructor>=1.0.0
+
+# --- LangGraph 工作流 ---
+langchain
+langchain-core
+langgraph
+langchain-community
+langchain-text-splitters>=0.0.1
+
+# --- 向量数据库与 RAG ---
+chromadb>=0.4.22
+thefuzz
+python-Levenshtein
+rank_bm25>=0.2.2
+sentence-transformers>=2.2.2
+
+# --- Web 研究与数据抓取 ---
+google-api-python-client
+google-auth-httplib2
+google-auth-oauthlib
+requests
+beautifulsoup4
+lxml
+aiohttp
+certifi
+
+# --- 智能抓取器依赖 ---
+httpx>=0.25.0
+playwright>=1.40.0
+trafilatura>=1.6.0
+readability-lxml>=0.8.1
+boilerpy3>=1.0.6
+
+# --- 全能文档解析 ---
+python-docx
+python-pptx
+pdf2image
+pytesseract
+Pillow
+
+# --- 文档与文件处理 (原有) ---
+PyMuPDF
+python-dotenv
+
+# --- 健壮性与异步处理 ---
+tenacity
+nest-asyncio
+aiolimiter
+
+# --- JSON处理增强 ---
+json-repair>=0.7.0
+
+# --- 文件类型检测 ---
+python-magic>=0.4.27
+python-magic-bin>=0.4.14  # Windows支持
+
+# --- 向量计算优化 ---
+scipy>=1.11.0
+scikit-learn>=1.3.0
+
+# --- 自然语言处理 ---
+nltk>=3.8.1
+
+# --- 缓存系统 ---
+diskcache>=5.6.3
+
+# --- HTML解析增强 ---
+justext>=3.0.0
+
+# --- 引用格式化 ---
+citeproc-py>=0.6.0
+
+# --- 配置管理增强 ---
+pydantic-settings>=2.0.0
+
+# --- 进度条美化 ---
+rich>=13.7.0
+
+# --- 日志系统 ---
+loguru>=0.7.0
+
+# --- Web UI 界面 ---
+fastapi
+uvicorn
+jinja2
+aiofiles
+
+# --- Google API 依赖 ---
+httplib2
+python-multipart
+
+# --- LaTeX处理增强 ---
+pylatexenc>=2.10

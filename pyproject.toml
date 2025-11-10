@@ -1,0 +1,122 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "DeepResearch_Enhanced_Crawler"
+version = "1.0.0"
+dependencies = [
+    "openai>=1.12.0",
+    "tiktoken",
+    "pydantic>=2.7.0,<3",
+    "instructor>=1.0.0",
+    "langchain",
+    "langchain-core",
+    "langgraph",
+    "langchain-community",
+    "chromadb>=0.4.22",
+    "thefuzz",
+    "python-Levenshtein",
+    "rank_bm25>=0.2.2",
+    "sentence-transformers>=2.2.2",
+    "google-api-python-client",
+    "google-auth-httplib2",
+    "google-auth-oauthlib",
+    "requests",
+    "beautifulsoup4",
+    "lxml",
+    "aiohttp",
+    "certifi",
+    "httpx>=0.25.0",
+    "playwright>=1.40.0",
+    "trafilatura>=1.6.0",
+    "readability-lxml>=0.8.1",
+    "boilerpy3>=1.0.6",
+    "python-docx",
+    "python-pptx",
+    "pdf2image",
+    "pytesseract",
+    "Pillow",
+    "PyMuPDF",
+    "python-dotenv",
+    "tenacity",
+    "nest-asyncio",
+    "fastapi",
+    "uvicorn",
+    "jinja2",
+    "aiofiles",
+    "httplib2",
+    "python-multipart",
+]
+
+[project.optional-dependencies]
+dev = [
+    "ruff",
+    "mypy",
+    "pytest",
+    "pytest-cov",
+    "pytest-mock",
+]
+
+# =========================
+#         Ruff
+# =========================
+[tool.ruff]
+line-length = 300
+target-version = "py311"
+exclude = [
+    "build", "dist", ".venv", "__pycache__", ".mypy_cache", ".ruff_cache", "migrations"
+]
+
+[tool.ruff.lint]
+# Enable: Common errors/warnings (E/F/W) + Import sorting (I) + Syntax upgrades (UP)
+select = ["E", "F", "W", "I", "UP"]
+
+# Optional additional rules (examples, commented out by default)
+# extend-fixable = ["I", "UP"]
+# extend-unsafe-fixes = ["UP037"]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/**" = ["D"]
+"workflows/prompts.py" = ["E501"]
+"workflows/nodes/**" = ["E501"]
+"planning/outline.py" = ["E501"]
+"planning/tool_definitions.py" = ["E501"]
+"scripts/**" = ["E501"]
+"services/fetchers.py" = ["E501"]
+
+[tool.ruff.format]
+# Exclude certain paths if needed
+# exclude = ["**/migrations/**"]
+
+# =========================
+#         pytest
+# =========================
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+addopts = [
+    "-v",
+    "--tb=short",
+    "--strict-markers",
+    # Coverage options (需要安装 pytest-cov: pip install pytest-cov)
+    # "--cov=.",
+    # "--cov-report=html",
+    # "--cov-report=term-missing",
+    # "--cov-report=json",
+    # "--cov-fail-under=30",  # 目标覆盖率30%
+]
+
+markers = [
+    "slow: marks tests as slow (deselect with '-m \"not slow\"')",
+    "integration: marks tests as integration tests",
+    "unit: marks tests as unit tests",
+]
+
+# =========================
+#         mypy
+# =========================
+[tool.mypy]
+ignore_missing_imports = true
