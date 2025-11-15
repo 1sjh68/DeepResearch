@@ -6,16 +6,16 @@ import logging
 import os
 import re
 from dataclasses import dataclass
-from datetime import datetime
 
 from config import Config
-from services.llm_interaction import preflight_llm_connectivity
-from services.vector_db import VectorDBManager
-from utils.text_processor import (
+from logic.file_saver import save_final_result
+from logic.post_processing import (
     consolidate_document_structure,
     final_post_processing,
     quality_check,
 )
+from services.llm_interaction import preflight_llm_connectivity
+from services.vector_db import VectorDBManager
 from workflows.graph_runner import run_graph_workflow
 
 
@@ -67,31 +67,7 @@ def run_workflow_pipeline(
 
     logging.info("\n--- 工作流完成，正在进行最终的后处理、评估与保存 ---")
 
-    def _extract_heading_fingerprint(md_text: str) -> list[tuple[int, str, str | None]]:
-        """提取有序的(level, title_text, section_id)列表，用于结构一致性校验。"""
-        if not md_text:
-            return []
-        heading_re = re.compile(
-            r"^(#{1,6})\s+(.*?)(?:\s*<!--\s*section_id:\s*([A-Za-z0-9_-]+)\s*-->)?\s*$",
-            re.MULTILINE,
-        )
-        result: list[tuple[int, str, str | None]] = []
-        for line in md_text.splitlines():
-            m = heading_re.match(line)
-            if m:
-                level = len(m.group(1))
-                title_text = (m.group(2) or "").strip()
-                section_id = m.group(3)
-                result.append((level, title_text, section_id))
-        return result
-
-    before_fp = _extract_heading_fingerprint(raw_result)
     structured_answer = consolidate_document_structure(raw_result)
-    after_fp = _extract_heading_fingerprint(structured_answer)
-
-    def _filter_fingerprint(fp: list[tuple[int, str, str | None]]):
-        # 忽略无 section_id 的章节，这些章节在整合过程中可能被去重或重排
-        return [item for item in fp if item[2]]
 
     # 实例级开关，若未配置则默认开启
     strict_enforce = getattr(config, "STRICT_STRUCTURE_ENFORCEMENT", True)
@@ -100,48 +76,41 @@ def run_workflow_pipeline(
     use_fallback = False
     fallback_content: str | None = None
     if strict_enforce:
-        before_filtered = _filter_fingerprint(before_fp)
-        after_filtered = _filter_fingerprint(after_fp)
-        if before_filtered != after_filtered:
-            logging.warning("结构健康检查失败：合并后标题/ID 列表与合并前不一致。")
-            logging.warning("  - 合并前: %s", before_filtered)
-            logging.warning("  - 合并后: %s", after_filtered)
-            if fallback_on_mismatch:
-                # 优先回退到最近的 refine 快照
-                latest_refine_path = None
-                session_dir = config.session_dir
-                try:
-                    if session_dir and os.path.isdir(session_dir):
-                        iter_dir = os.path.join(session_dir, "iterations")
-                        if os.path.isdir(iter_dir):
-                            candidates = [os.path.join(iter_dir, fn) for fn in os.listdir(iter_dir) if fn.startswith("iter_") and "_refine" in fn and fn.endswith(".md")]
-                            if candidates:
+        # 优先回退到最近的 refine 快照
+        latest_refine_path = None
+        session_dir = config.session_dir
+        try:
+            if session_dir and os.path.isdir(session_dir):
+                iter_dir = os.path.join(session_dir, "iterations")
+                if os.path.isdir(iter_dir):
+                    candidates = [os.path.join(iter_dir, fn) for fn in os.listdir(iter_dir) if fn.startswith("iter_") and "_refine" in fn and fn.endswith(".md")]
+                    if candidates:
 
-                                def _candidate_key(path: str) -> tuple[int, float]:
-                                    name = os.path.basename(path)
-                                    match = re.search(r"iter_(\d+)", name)
-                                    iter_index = int(match.group(1)) if match else -1
-                                    try:
-                                        mtime = os.path.getmtime(path)
-                                    except OSError:
-                                        mtime = 0.0
-                                    return iter_index, mtime
+                        def _candidate_key(path: str) -> tuple[int, float]:
+                            name = os.path.basename(path)
+                            match = re.search(r"iter_(\d+)", name)
+                            iter_index = int(match.group(1)) if match else -1
+                            try:
+                                mtime = os.path.getmtime(path)
+                            except OSError:
+                                mtime = 0.0
+                            return iter_index, mtime
 
-                                latest_refine_path = max(candidates, key=_candidate_key)
-                except Exception as _e:
-                    logging.warning("扫描 refine 快照失败: %s", _e)
+                        latest_refine_path = max(candidates, key=_candidate_key)
+        except Exception as _e:
+            logging.warning("扫描 refine 快照失败: %s", _e)
 
-                if latest_refine_path and os.path.isfile(latest_refine_path):
-                    try:
-                        with open(latest_refine_path, encoding="utf-8") as rf:
-                            fallback_content = rf.read()
-                        logging.info("回退到最新 refine 快照: %s", latest_refine_path)
-                    except Exception as _e:
-                        logging.warning("读取 refine 快照失败，将回退到合并前的抛光文本: %s", _e)
-                        fallback_content = raw_result
-                else:
-                    fallback_content = raw_result
-                use_fallback = True
+        if latest_refine_path and os.path.isfile(latest_refine_path):
+            try:
+                with open(latest_refine_path, encoding="utf-8") as rf:
+                    fallback_content = rf.read()
+                logging.info("回退到最新 refine 快照: %s", latest_refine_path)
+            except Exception as _e:
+                logging.warning("读取 refine 快照失败，将回退到合并前的抛光文本: %s", _e)
+                fallback_content = raw_result
+        else:
+            fallback_content = raw_result
+        use_fallback = True
 
     final_answer = final_post_processing(fallback_content if use_fallback and fallback_content else structured_answer)
 
@@ -155,19 +124,7 @@ def run_workflow_pipeline(
 
     saved_filepath = None
     if save_result:
-        filename = output_filename or f"final_solution_{datetime.now().strftime('%Y%m%d_%H%M%S')}.md"
-        session_dir = config.session_dir
-        if session_dir and os.path.isdir(session_dir):
-            saved_filepath = os.path.join(session_dir, filename)
-            try:
-                with open(saved_filepath, "w", encoding="utf-8") as f:
-                    f.write(final_answer)
-                logging.info("🎉 最终报告已成功保存至: %s", saved_filepath)
-            except Exception as exc:
-                logging.error("保存最终报告时发生错误: %s", exc)
-                saved_filepath = None
-        else:
-            logging.error("会话目录不存在，无法保存最终文件。")
+        saved_filepath = save_final_result(config, final_answer, output_filename)
 
     return WorkflowResult(
         raw_result=raw_result,
