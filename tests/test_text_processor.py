@@ -10,7 +10,7 @@ class TestConsolidateDocumentStructure:
 
     def test_consolidate_simple_document(self):
         """测试简单文档合并"""
-        from utils.text_processor import consolidate_document_structure
+        from logic.post_processing import consolidate_document_structure
 
         text = "# Title\n\nContent here.\n\n# Title\n\nMore content."
 
@@ -21,7 +21,7 @@ class TestConsolidateDocumentStructure:
 
     def test_consolidate_empty_document(self):
         """测试空文档"""
-        from utils.text_processor import consolidate_document_structure
+        from logic.post_processing import consolidate_document_structure
 
         text = ""
         result = consolidate_document_structure(text)
@@ -30,7 +30,7 @@ class TestConsolidateDocumentStructure:
 
     def test_consolidate_with_section_ids(self):
         """测试带section_id的文档"""
-        from utils.text_processor import consolidate_document_structure
+        from logic.post_processing import consolidate_document_structure
 
         text = (
             "# Title <!-- section_id: intro -->\n\n"
@@ -50,7 +50,7 @@ class TestFinalPostProcessing:
 
     def test_final_post_processing_basic(self):
         """测试基本后处理"""
-        from utils.text_processor import final_post_processing
+        from logic.post_processing import final_post_processing
 
         text = "# Title\n\nSome content with extra   spaces."
 
@@ -61,7 +61,7 @@ class TestFinalPostProcessing:
 
     def test_final_post_processing_empty(self):
         """测试空文本后处理"""
-        from utils.text_processor import final_post_processing
+        from logic.post_processing import final_post_processing
 
         result = final_post_processing("")
 

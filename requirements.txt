@@ -56,7 +56,6 @@ json-repair>=0.7.0
 
 # --- 文件类型检测 ---
 python-magic>=0.4.27
-python-magic-bin>=0.4.14  # Windows支持
 
 # --- 向量计算优化 ---
 scipy>=1.11.0
